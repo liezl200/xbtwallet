@@ -5,12 +5,22 @@ import jinja2
 import os
 import logging
 import random
+import header
+import wallet
 from google.appengine.ext import ndb
 from google.appengine.api import users
 
 class MainHandler(webapp2.RequestHandler):
-    def get(self):
-        self.response.write('Hello world!')
+  def get(self):
+    renderedHeader = header.getHeader('/')
+    if(users.get_current_user() == None):
+      renderedHeader = renderedHeader.replace('<li><a href="/settings">SETTINGS</a></li>', '')
+      renderedHeader = renderedHeader.replace('Logout', 'Login')
+      renderedHeader = renderedHeader.replace('LOGOUT', 'LOGIN')
+    template_values = {"header": renderedHeader, "footer":header.getFooter()}
+    template_values['randomImg'] = "/static/201.jpg"
+    template = jinja_environment.get_template('home.html')
+    self.response.out.write(template.render(template_values))
 
 class LoginHandler(webapp2.RequestHandler):
   def get(self):
@@ -23,17 +33,30 @@ class LogoutHandler(webapp2.RequestHandler):
     self.redirect(logouturl)
     logging.info(logouturl)
 
+class ColophonHandler(webapp2.RequestHandler):
+  def get(self):
+    template_values = {"header": renderedHeader, "footer":header.getFooter()}
+    template = jinja_environment.get_template('colophon.html')
+    self.response.out.write(template.render(template_values))
+
+class TheoryHandler(webapp2.RequestHandler):
+  def get(self):
+    template_values = {"header": renderedHeader, "footer":header.getFooter()}
+    template = jinja_environment.get_template('colophon.html')
+    self.response.out.write(template.render(template_values))
+
 jinja_environment = jinja2.Environment(loader=
-      jinja2.FileSystemLoader(os.path.dirname(__file__)))
+  jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 app = webapp2.WSGIApplication([
-    ('/', MainHandler),
-    ('/Logout', LogoutHandler),
-    ('/Login', LoginHandler),
-    ('/wallet', WalletHandler),
-    ('/makePaper', PaperHandler),
-    ('/colophon', ColophonHandler),
-    ('/theory', TheoryHandler),
-    ('/settings', SettingsHandler),
+  ('/', MainHandler),
+  ('/Logout', LogoutHandler),
+  ('/Login', LoginHandler),
+  ('/colophon', ColophonHandler),
+  ('/theory', TheoryHandler),
+  ('/wallet', wallet.WalletHandler),
+  ('/newAddress', wallet.CreateAddressHandler),
+  ('/makePaper', wallet.PaperHandler),
+  ('/settings', wallet.SettingsHandler),
 ], debug=True)
 

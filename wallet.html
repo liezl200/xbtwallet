@@ -1,0 +1,41 @@
+<html>
+<head>
+
+  <title>XBT Wallet</title>
+  <link rel="icon" type="image/png" href="static/favicon.png"/>
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/sitestyle.css">
+  <link rel="stylesheet" href="/static/font-awesome.css">
+  <script src="/static/jquery-1.11.1.min.js"></script>
+
+</head>
+<body>
+  {{header}}
+
+  <div class="container bs-docs-container">
+  <div class="bs-docs-section">
+
+    <h2>Bitcoin Wallets</h2>
+    <h1>Total balance: {{totalbal}}</h1>
+    {% if not wallets %}
+      <p> You don't have any Bitcoin wallet addresses to send/ receive bitcoin. Create one below! </p>
+    {% else %}
+      <ul>
+      {% for address in addresses %}
+
+        <li>{{address.address}}</li>
+        <li>{{address.name}}</li>
+        <li>{{address.balance}}</li>
+
+      {% endfor %}
+      </ul>
+    {% endif %}
+    <p>Warning: For security reasons, if you create a new Bitcoin receiving address using this app, no entity (not even you) will be able to access the private key associated with this address. This means you cannot use this address as a paper wallet, and you can only spend the Bitcoin received through this app with this app.</p>
+    <!-- insert form here to create new Bitcoin address (optional name) !-->
+    <!-- put the total balance in a hidden field in the form-->
+  </div>
+  </div>
+  {{footer}}
+
+</body>
+</html>

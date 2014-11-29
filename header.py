@@ -27,8 +27,8 @@ footer = '''
 <script src="/static/bootstrap.min.js"></script>
 '''
 
-def getHeader(pageRoute):
+def getHeader(pageRoute="/"):
   return header
 
-def getFooter(pageRoute):
+def getFooter(pageRoute="/"):
   return footer
