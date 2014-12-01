@@ -9,7 +9,7 @@ import time
 import random
 import hmac
 import ripemd
-import six
+#import six
 
 # Elliptic curve parameters (secp256k1)
 

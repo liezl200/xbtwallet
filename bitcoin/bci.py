@@ -3,7 +3,7 @@ import json
 import re
 import random
 import sys
-from six.moves import urllib
+#from six.moves import urllib
 
 
 # Makes a request to a given URL (first arg) and optional params (second arg)

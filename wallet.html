@@ -17,22 +17,27 @@
 
     <h2>Bitcoin Wallets</h2>
     <h1>Total balance: {{totalbal}}</h1>
-    {% if not wallets %}
+    {% if not addresses %}
       <p> You don't have any Bitcoin wallet addresses to send/ receive bitcoin. Create one below! </p>
     {% else %}
       <ul>
       {% for address in addresses %}
 
         <li>{{address.address}}</li>
+        {% if name %}
         <li>{{address.name}}</li>
+        {% endif %}
         <li>{{address.balance}}</li>
 
       {% endfor %}
       </ul>
     {% endif %}
     <p>Warning: For security reasons, if you create a new Bitcoin receiving address using this app, no entity (not even you) will be able to access the private key associated with this address. This means you cannot use this address as a paper wallet, and you can only spend the Bitcoin received through this app with this app.</p>
-    <!-- insert form here to create new Bitcoin address (optional name) !-->
-    <!-- put the total balance in a hidden field in the form-->
+    <!-- form to create new Bitcoin address (w/ optional name) !-->
+    <form action="newAddress" id="createAddress">
+      <input type="text" name="name">
+      <input type="submit" id="submitButton">
+    </form>
   </div>
   </div>
   {{footer}}
