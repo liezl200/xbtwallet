@@ -15,7 +15,7 @@
   <div class="bs-docs-section">
 
     <h2>Bitcoin Wallet</h2>
-    <h1>Total balance: {{totalbal}}</h1>
+    <h1>Total balance: {{totalbal}} XBT</h1>
     {% if not addresses %}
       <p> You don't have any Bitcoin wallet addresses to send/ receive bitcoin. Create one below! </p>
     {% else %}
@@ -28,7 +28,7 @@
         {% else %}
         <li>Unnamed address</li>
         {% endif %}
-        <li>{{address.balance}}</li>
+        <li>{{address.balance}} XBT</li>
         <br>
 
       {% endfor %}
@@ -41,8 +41,8 @@
       <input type="submit" id="submitNew" value="Create Address">
     </form>
     <form action="sendBitcoin" id="sendXBT">
-      <input type="text" name="sendAddr" placeholder="Bitcoin address to send to" required="required">
-      <input type="number" name="sendAmt" placeholder="Amount to send" step="0.00000001" min="0" required="required">
+      <input type="text" name="sendAddr" placeholder="Bitcoin address" required="required">
+      <input type="number" name="sendAmt" placeholder="XBT to send" step="0.00000001" min="0" required="required">
       <input type="submit" id="submitSend" value="Send bitcoin!">
     </form>
     <a href="/updateBalances">Update your balances</a>
