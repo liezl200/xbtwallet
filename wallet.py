@@ -47,9 +47,10 @@ class SendBitcoinHandler(webapp2.RequestHandler):
   def get(self):
     minefee = 0.0001
     user = users.get_current_user()
+    template_values = {'header': header.getHeader('/newAddress'), 'footer': header.getFooter()}
 
     # get amount to send and address to send to from the web form
-    sendAmt = self.request.get('sendAmt')
+    sendAmt = float(self.request.get('sendAmt'))
     sendAddr = self.request.get('sendAddr')
 
     # get user's current account balances
@@ -57,14 +58,16 @@ class SendBitcoinHandler(webapp2.RequestHandler):
     addresses = query.fetch()
     error = ''
     notif = ''
-    if(sendAmt + minefee > getBalance(addresses)):
+    if(sendAmt < 0):
+      error = 'Cannot send a negative amount of bitcoin'
+    elif(sendAmt + minefee > getBalance(addresses)):
       error = 'Cannot make the transaction because you do not have enough combined bitcoin associated with the addresses in your wallet. You requested to send ' + str(sendAmt) + ' BTC but you only have ' + str(getBalance(addresses)-minefee) + " BTC after a miner's fee of " + str(minefee) + ' is deducted.'
     else:
       sort(addresses)
 
       # figure out the user's addresses to use as inputs to the transaction
       uAddr = []
-      changeAddr = null #?
+      changeAddr = None #?
       currSend = sendAmt + minefee
       for a in addresses:
         if currSend == 0:
@@ -88,7 +91,7 @@ class SendBitcoinHandler(webapp2.RequestHandler):
 
       #figure out outputs (2)
       outs = [{'value': sendAmt, 'address': sendAddr.address}]
-      if(not changeAddr == null):
+      if(not changeAddr == None):
         outs.append({'value': changeAddr.balance, 'address': changeAddr.address})
         # change is the change address and amount of change is how much is in that address
       tx = mktx(ins, outs)
@@ -100,11 +103,14 @@ class SendBitcoinHandler(webapp2.RequestHandler):
       stx = signall(tx, keys)
       pushtx(stx)
       notif = 'Transaction broadcasted to Bitcoin network. Please allow at least 30 minutes for the transaction to be finalized.'
+      template_values['notif'] = notif
+      template_values['sendAmt'] = sendAmt
+      template_values['sendAddr'] = sendAddr
+      template_values['usedAddresses'] = uAddr
+      template_values['changeAddressObj'] = changeAddr
 
-    template_values['notif'] = notif
     template_values['error'] = error
-
-    template = main.jinja_environment.get_template('sendBTCtx.html')
+    template = main.jinja_environment.get_template('sendBitcoin.html')
     self.response.out.write(template.render(template_values))
 
 
@@ -119,6 +125,16 @@ class SettingsHandler(webapp2.RequestHandler):
 def generateAddress(user):
   query = Wallet.query().filter(Wallet.user == users.get_current_user())
   wallet = query.fetch()
+
+#update the balance for a single address
+def updateBalance(addr):
+  balance = urllib.urlopen('https://blockchain.info/q/addressbalance' + addr).read()
+  balance = int(balance) / 0.00000001
+  query = Address.query().filter(Address.address == addr)
+  aObj = query.fetch()
+  aObj.balance = balance
+  aObj.put()
+
 
 def getBalance(addresses):
   totalbal = 0

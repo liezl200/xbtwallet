@@ -56,6 +56,7 @@ app = webapp2.WSGIApplication([
   ('/theory', TheoryHandler),
   ('/wallet', wallet.WalletHandler),
   ('/newAddress', wallet.CreateAddressHandler),
+  ('/sendBitcoin', wallet.SendBitcoinHandler),
   ('/makePaper', wallet.PaperHandler),
   ('/settings', wallet.SettingsHandler),
 ], debug=True)
