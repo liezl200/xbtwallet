@@ -105,7 +105,7 @@ class SendBitcoinHandler(webapp2.RequestHandler):
         tx = sign(tx, i, keys[i])
       logging.info(tx)
       pushtx(tx)
-      notif = 'Transaction broadcasted to Bitcoin network. Please allow at least 30 minutes for the transaction to be finalized.'
+      notif = 'Transaction broadcasted to Bitcoin network. Please allow at least 60 minutes for the transaction to be finalized.'
       template_values['notif'] = notif
       template_values['sendAmt'] = sendAmt
       template_values['sendAddr'] = sendAddr
