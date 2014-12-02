@@ -9,12 +9,8 @@ header = '''
     <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
       <ul class="nav navbar-nav" >
         <li><a href="/wallet">WALLET</a></li>
-        <li><a href="/makePaper">PAPER</a></li>
-        <li><a href="/colophon">COLOPHON</a></li>
-        <li><a href="/theory">THEORY</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="/settings">SETTINGS</a></li>
         <li><a href="/Logout">LOGOUT</a></li>
       </ul>
     </nav>

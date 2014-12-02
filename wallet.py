@@ -63,10 +63,12 @@ class SendBitcoinHandler(webapp2.RequestHandler):
     elif(sendAmt + minefee > getBalance(addresses)):
       error = 'Cannot make the transaction because you do not have enough combined bitcoin associated with the addresses in your wallet. You requested to send ' + str(sendAmt) + ' BTC but you only have ' + str(getBalance(addresses)-minefee) + " BTC after a miner's fee of " + str(minefee) + ' is deducted.'
     else:
-      sort(addresses)
+      list.sort(addresses)
 
       # figure out the user's addresses to use as inputs to the transaction
       uAddr = []
+      ins = []
+      keys = []
       changeAddr = None #?
       currSend = sendAmt + minefee
       for a in addresses:
@@ -78,30 +80,31 @@ class SendBitcoinHandler(webapp2.RequestHandler):
           uAddr.append(a.address)
           currSend = currSend - a.balance
           a.balance = 0
+          unspentOutputs = unspent(a.address)
+          pq = Address.query().filter(Address.address == a.address)
+          key = pq.fetch()[0].pk
+          for u in unspentOutputs:
+            ins.append(u)
+            keys.append(key)
+            logging.info(key)
           if currSend < 0:
             a.balance = -currSend
             currSend = 0
             changeAddr = a
+          a.put()
 
 
       # it should work out so that outputs - inputs = minefee
-
-      # figure out inputs
-      ins = unspent(uAddr) #might have to unpack these addresses to use it as a parameter to the unspent function
-
-      #figure out outputs (2)
-      outs = [{'value': sendAmt, 'address': sendAddr.address}]
+      outs = [{'value': sendAmt / 0.00000001, 'address': sendAddr}]
       if(not changeAddr == None):
-        outs.append({'value': changeAddr.balance, 'address': changeAddr.address})
+        outs.append({'value': changeAddr.balance / 0.00000001, 'address': changeAddr.address})
         # change is the change address and amount of change is how much is in that address
       tx = mktx(ins, outs)
-      keys = []
-
-      for inp in ins:
-        pq = Address.query().filter(Address.address == inp)
-        keys.append(pq.fetch()[0].pk)
-      stx = signall(tx, keys)
-      pushtx(stx)
+      logging.info(keys)
+      for i in xrange(len(keys)):
+        tx = sign(tx, i, keys[i])
+      logging.info(tx)
+      pushtx(tx)
       notif = 'Transaction broadcasted to Bitcoin network. Please allow at least 30 minutes for the transaction to be finalized.'
       template_values['notif'] = notif
       template_values['sendAmt'] = sendAmt
@@ -113,6 +116,12 @@ class SendBitcoinHandler(webapp2.RequestHandler):
     template = main.jinja_environment.get_template('sendBitcoin.html')
     self.response.out.write(template.render(template_values))
 
+class UpdateHandler(webapp2.RequestHandler):
+  def get(self):
+    query = Address.query().filter(Address.user == users.get_current_user())
+    addresses = query.fetch()
+    updateUserBalances(addresses)
+    self.redirect('/wallet')
 
 class PaperHandler(webapp2.RequestHandler):
   def get(self):
@@ -128,13 +137,18 @@ def generateAddress(user):
 
 #update the balance for a single address
 def updateBalance(addr):
-  balance = urllib.urlopen('https://blockchain.info/q/addressbalance' + addr).read()
-  balance = int(balance) / 0.00000001
+  balance = urllib.urlopen('https://blockchain.info/q/addressbalance/' + addr + '?confirmations=6').read()
+  logging.info('https://blockchain.info/q/addressbalance' + addr + '?confirmations=6')
+  balance = int(balance) * 0.00000001
   query = Address.query().filter(Address.address == addr)
-  aObj = query.fetch()
+  aObj = query.fetch()[0]
   aObj.balance = balance
   aObj.put()
 
+def updateUserBalances(addresses):
+  logging.info("updating balances")
+  for a in addresses:
+    updateBalance(a.address)
 
 def getBalance(addresses):
   totalbal = 0

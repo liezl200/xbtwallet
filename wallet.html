@@ -5,7 +5,6 @@
   <link rel="icon" type="image/png" href="static/favicon.png"/>
   <link rel="stylesheet" href="/static/bootstrap.min.css">
   <link rel="stylesheet" href="/static/sitestyle.css">
-  <link rel="stylesheet" href="/static/font-awesome.css">
   <script src="/static/jquery-1.11.1.min.js"></script>
 
 </head>
@@ -27,7 +26,7 @@
         {% if address.name %}
         <li>{{address.name}}</li>
         {% else %}
-        <li>No name</li>
+        <li>Unnamed address</li>
         {% endif %}
         <li>{{address.balance}}</li>
         <br>
@@ -42,15 +41,14 @@
       <input type="submit" id="submitNew" value="Create Address">
     </form>
     <form action="sendBitcoin" id="sendXBT">
-      <input type="text" name="sendAddr" placeholder="Bitcoin address to send to">
-      <input type="number" name="sendAmt" placeholder="Amount to send" step="0.00000001" min="0">
+      <input type="text" name="sendAddr" placeholder="Bitcoin address to send to" required="required">
+      <input type="number" name="sendAmt" placeholder="Amount to send" step="0.00000001" min="0" required="required">
       <input type="submit" id="submitSend" value="Send bitcoin!">
     </form>
-    <form action="updateBalances" id="update">
-      <input type="submit" id="submitUpdate" value="Update Balances">
-    </form>
+    <a href="/updateBalances">Update your balances</a>
   </div>
   </div>
+  <br><br><br><br>
   {{footer}}
 
 </body>

@@ -3,12 +3,13 @@ import json
 import re
 import random
 import sys
+import urllib2
 #from six.moves import urllib
 
 
 # Makes a request to a given URL (first arg) and optional params (second arg)
 def make_request(*args):
-    opener = urllib.request.build_opener()
+    opener = urllib2.build_opener()
     opener.addheaders = [('User-agent',
                           'Mozilla/5.0'+str(random.randrange(1000000)))]
     try:

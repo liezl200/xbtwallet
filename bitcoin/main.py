@@ -9,6 +9,7 @@ import time
 import random
 import hmac
 import ripemd
+#import logging
 #import six
 
 # Elliptic curve parameters (secp256k1)
@@ -72,7 +73,12 @@ def encode(val, base, minlen=0):
     code_string = get_code_string(base)
     result = ""
     while val > 0:
-        result = code_string[val % base] + result
+        '''logging.info(val)
+        logging.info(base)
+        logging.info(result)
+        logging.info("attempt")
+        '''
+        result = code_string[int(int(val) % base)] + result
         val //= base
     return lpad(result, code_string[0], minlen)
 
@@ -264,7 +270,7 @@ def decode_pubkey(pub, formt=None):
     else: raise Exception("Invalid format!")
 
 def get_privkey_format(priv):
-    if isinstance(priv, six.integer_types): return 'decimal'
+    if isinstance(priv, (int,long)): return 'decimal'
     elif len(priv) == 32: return 'bin'
     elif len(priv) == 33: return 'bin_compressed'
     elif len(priv) == 64: return 'hex'
@@ -276,7 +282,7 @@ def get_privkey_format(priv):
         else: raise Exception("WIF does not represent privkey")
 
 def encode_privkey(priv, formt, vbyte=0):
-    if not isinstance(priv, six.integer_types):
+    if not isinstance(priv, (int,long)):
         return encode_privkey(decode_privkey(priv), formt, vbyte)
     if formt == 'decimal': return priv
     elif formt == 'bin': return encode(priv, 256, 32)
