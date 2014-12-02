@@ -1,0 +1,39 @@
+<html>
+<head>
+
+  <title>XBT Wallet</title>
+  <link rel="icon" type="image/png" href="static/favicon.png"/>
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/sitestyle.css">
+  <script src="/static/jquery-1.11.1.min.js"></script>
+
+</head>
+<body>
+  {{header}}
+
+  <div class="container bs-docs-container">
+  <div class="bs-docs-section">
+
+    <h1>{{error}}</h1>
+    {% if not error %}
+      <h1>{{notif}}</h1>
+      <h2>You sent bitcoin to someone!</h2>
+      <h1>{{sendAddr}}</h1>
+      <h1>{{sendAmt}}</h1>
+
+      {% for used in usedAddresses %}
+        <p>{{used}}</p>
+      {% endfor %}
+
+      {% if changeAddr %}
+        <p>Your change ({{changeAddr.balance}} XBT) was sent to one of the addresses you own (the address that was determined to have the most balance): {{changeAddr.address}}</p>
+      {% endif %}
+    {% endif %}
+    <a href="/wallet">Return to your wallet</a>
+
+  </div>
+  </div>
+  {{footer}}
+
+</body>
+</html>
