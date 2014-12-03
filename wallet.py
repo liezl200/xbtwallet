@@ -81,7 +81,7 @@ class SendBitcoinHandler(webapp2.RequestHandler):
         elif a.balance > 0:
           uAddr.append(a.address)
           currSend = currSend - a.balance
-          t = Transaction(address=a.address, tAmt=a.balance, timestamp=datetime.now())
+          t = Transaction(address=a.address, tAmt=a.balance, timestamp=datetime.datetime.now())
           t.put()
           a.balance = 0
           unspentOutputs = unspent(a.address)
@@ -146,7 +146,7 @@ def updateBalance(addr):
   balance = int(balance) * 0.00000001
   # Check if sent transactions are still pending, and if they are then subtract accordingly
 
-  curr = datetime.now()
+  curr = datetime.datetime.now()
   date += datetime.timedelta(days=1)
 
   query = Transaction.query().filter(Address.address == addr)
