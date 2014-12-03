@@ -147,7 +147,6 @@ def updateBalance(addr):
   # Check if sent transactions are still pending, and if they are then subtract accordingly
 
   curr = datetime.datetime.now()
-  date += datetime.timedelta(days=1)
 
   query = Transaction.query().filter(Address.address == addr)
   transactions = query.fetch()
