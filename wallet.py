@@ -4,6 +4,7 @@ from google.appengine.ext import ndb
 from google.appengine.api import users
 from bitcoin.transaction import *
 from bitcoin.bci import *
+import datetime
 import urllib
 
 class Address(ndb.Model):
@@ -12,6 +13,12 @@ class Address(ndb.Model):
   user = ndb.UserProperty(required=True)
   balance = ndb.FloatProperty(required=True)
   name = ndb.StringProperty()
+
+class Transaction(ndb.Model):
+  address = ndb.StringProperty(required=True)
+  #thash = ndb.StringProperty(required=True)
+  tamt = ndb.FloatProperty(required=True)
+  timestamp = ndb.DateProperty(required=True)
 
 class WalletHandler(webapp2.RequestHandler):
   def get(self):
@@ -23,11 +30,6 @@ class WalletHandler(webapp2.RequestHandler):
     template_values['totalbal'] = totalbal
     template = main.jinja_environment.get_template('wallet.html')
     self.response.out.write(template.render(template_values))
-
-    #get amount of Bitcoin
-    #display public Bitcoin address
-    #button to go to footer
-    #generate new bitcoin address
 
 class CreateAddressHandler(webapp2.RequestHandler):
   def get(self):
@@ -79,6 +81,8 @@ class SendBitcoinHandler(webapp2.RequestHandler):
         elif a.balance > 0:
           uAddr.append(a.address)
           currSend = currSend - a.balance
+          t = Transaction(address=a.address, tAmt=a.balance, timestamp=datetime.date.now())
+          t.put()
           a.balance = 0
           unspentOutputs = unspent(a.address)
           pq = Address.query().filter(Address.address == a.address)
@@ -140,6 +144,21 @@ def updateBalance(addr):
   balance = urllib.urlopen('https://blockchain.info/q/addressbalance/' + addr + '?confirmations=6').read()
   logging.info('https://blockchain.info/q/addressbalance' + addr + '?confirmations=6')
   balance = int(balance) * 0.00000001
+  # Check if sent transactions are still pending, and if they are then subtract accordingly
+
+  curr = datetime.date.now()
+  date += datetime.timedelta(days=1)
+
+  query = Transaction.query().filter(Address.address == addr)
+  transactions = query.fetch()
+  for t in transactions:
+    ttime = t.timestamp
+    expiry = datetime.timedelta(minutes=60)
+    if ttime >= expiry:
+      t.delete()
+    else:
+      balance -= t.tamt
+
   query = Address.query().filter(Address.address == addr)
   aObj = query.fetch()[0]
   aObj.balance = balance
