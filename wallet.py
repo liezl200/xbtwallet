@@ -17,7 +17,7 @@ class Address(ndb.Model):
 class Transaction(ndb.Model):
   address = ndb.StringProperty(required=True)
   #thash = ndb.StringProperty(required=True)
-  tamt = ndb.FloatProperty(required=True)
+  tAmt = ndb.FloatProperty(required=True)
   timestamp = ndb.DateProperty(required=True)
 
 class WalletHandler(webapp2.RequestHandler):
